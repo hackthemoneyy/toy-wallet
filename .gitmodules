@@ -1,0 +1,3 @@
+[submodule "mpc-server"]
+	path = mpc-server
+	url = https://github.com/hackthemoneyy/mpc-server.git
