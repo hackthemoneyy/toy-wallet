@@ -63,7 +63,7 @@ export function WalletDashboard() {
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between p-4 border-b border-border"
+        className="flex items-center justify-between p-4 border-b border"
       >
         <Button variant="ghost" size="icon" onClick={handleBack}>
           <ChevronLeft className="w-5 h-5" />
@@ -181,7 +181,7 @@ export function WalletDashboard() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.4 + index * 0.05 }}
                       >
-                        <div className="flex items-center justify-between p-4 hover:bg-background-tertiary/50 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-between p-4 hover:bg-secondary/50 transition-colors cursor-pointer">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
                               <span className="text-white font-bold text-sm">
@@ -190,12 +190,12 @@ export function WalletDashboard() {
                             </div>
                             <div>
                               <p className="font-medium text-white">{token.name}</p>
-                              <p className="text-sm text-text-muted">{token.symbol}</p>
+                              <p className="text-sm text-muted-foreground">{token.symbol}</p>
                             </div>
                           </div>
                           <div className="text-right">
                             <p className="font-medium text-white">{token.balance}</p>
-                            <p className="text-sm text-text-secondary">
+                            <p className="text-sm text-muted-foreground">
                               {formatUSD(token.usdValue)}
                             </p>
                           </div>
@@ -220,7 +220,7 @@ export function WalletDashboard() {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.4 + index * 0.1 }}
-                            className="rounded-xl overflow-hidden bg-background-tertiary border border-border hover:border-purple-500/50 transition-all cursor-pointer"
+                            className="rounded-xl overflow-hidden bg-secondary border border hover:border-purple-500/50 transition-all cursor-pointer"
                           >
                             <div className="aspect-square bg-gradient-to-br from-purple-600/20 to-purple-800/20 flex items-center justify-center">
                               <Image className="w-12 h-12 text-purple-400/50" />
@@ -229,15 +229,15 @@ export function WalletDashboard() {
                               <p className="font-medium text-white text-sm truncate">
                                 {nft.name}
                               </p>
-                              <p className="text-xs text-text-muted">{nft.collection}</p>
+                              <p className="text-xs text-muted-foreground">{nft.collection}</p>
                             </div>
                           </motion.div>
                         ))}
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <Image className="w-12 h-12 text-text-muted mx-auto mb-3" />
-                        <p className="text-text-secondary">No NFTs yet</p>
+                        <Image className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                        <p className="text-muted-foreground">No NFTs yet</p>
                       </div>
                     )}
                   </CardContent>
@@ -260,13 +260,13 @@ export function WalletDashboard() {
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">
+              <label className="text-sm text-muted-foreground mb-2 block">
                 Recipient Address
               </label>
               <Input placeholder="0x..." />
             </div>
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">Amount</label>
+              <label className="text-sm text-muted-foreground mb-2 block">Amount</label>
               <Input type="number" placeholder="0.00" />
             </div>
             <Button className="w-full">Continue</Button>
@@ -285,9 +285,9 @@ export function WalletDashboard() {
             <DialogDescription>Share your address to receive tokens</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
-            <div className="p-4 bg-background-tertiary rounded-xl text-center">
+            <div className="p-4 bg-secondary rounded-xl text-center">
               <div className="w-32 h-32 mx-auto bg-white rounded-xl mb-4 flex items-center justify-center">
-                <span className="text-text-muted text-xs">QR Code</span>
+                <span className="text-muted-foreground text-xs">QR Code</span>
               </div>
               <p className="text-sm text-white font-mono break-all">
                 {activeWallet.address}
@@ -322,7 +322,7 @@ export function WalletDashboard() {
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">From</label>
+              <label className="text-sm text-muted-foreground mb-2 block">From</label>
               <div className="flex gap-2">
                 <Button variant="secondary" className="min-w-[100px]">
                   ETH
@@ -331,12 +331,12 @@ export function WalletDashboard() {
               </div>
             </div>
             <div className="flex justify-center">
-              <div className="w-10 h-10 rounded-full bg-background-tertiary border border-border flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-secondary border border flex items-center justify-center">
                 <ArrowLeftRight className="w-4 h-4 text-purple-400 rotate-90" />
               </div>
             </div>
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">To</label>
+              <label className="text-sm text-muted-foreground mb-2 block">To</label>
               <div className="flex gap-2">
                 <Button variant="secondary" className="min-w-[100px]">
                   USDC
@@ -361,13 +361,13 @@ export function WalletDashboard() {
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">
+              <label className="text-sm text-muted-foreground mb-2 block">
                 Amount (USD)
               </label>
               <Input type="number" placeholder="100.00" />
             </div>
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">
+              <label className="text-sm text-muted-foreground mb-2 block">
                 You receive
               </label>
               <div className="flex gap-2">
@@ -394,7 +394,7 @@ export function WalletDashboard() {
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">Sell</label>
+              <label className="text-sm text-muted-foreground mb-2 block">Sell</label>
               <div className="flex gap-2">
                 <Button variant="secondary" className="min-w-[100px]">
                   ETH
@@ -403,7 +403,7 @@ export function WalletDashboard() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">
+              <label className="text-sm text-muted-foreground mb-2 block">
                 You receive (USD)
               </label>
               <Input type="number" placeholder="~0.00" readOnly />

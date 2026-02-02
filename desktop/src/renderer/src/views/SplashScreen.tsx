@@ -107,7 +107,7 @@ export function SplashScreen() {
       </motion.h1>
 
       <motion.p
-        className="mt-2 text-text-secondary text-sm"
+        className="mt-2 text-muted-foreground text-sm"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.7, duration: 0.5 }}

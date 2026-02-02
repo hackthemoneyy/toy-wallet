@@ -63,7 +63,7 @@ export function WalletSelection() {
             <Wallet className="w-8 h-8 text-white" />
           </motion.div>
           <h1 className="text-2xl font-bold text-white mb-2">Your Wallets</h1>
-          <p className="text-text-secondary text-sm">
+          <p className="text-muted-foreground text-sm">
             Select a wallet or create a new one
           </p>
         </div>
@@ -92,7 +92,7 @@ export function WalletSelection() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-white">{wallet.name}</h3>
-                        <p className="text-sm text-text-muted">
+                        <p className="text-sm text-muted-foreground">
                           {shortenAddress(wallet.address)}
                         </p>
                       </div>
@@ -102,11 +102,11 @@ export function WalletSelection() {
                         <p className="font-semibold text-white">
                           {wallet.balance} ETH
                         </p>
-                        <p className="text-sm text-text-secondary">
+                        <p className="text-sm text-muted-foreground">
                           {formatUSD(wallet.usdBalance)}
                         </p>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-text-muted group-hover:text-purple-400 transition-colors" />
+                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-purple-400 transition-colors" />
                     </div>
                   </div>
                 </Card>
@@ -164,7 +164,7 @@ export function WalletSelection() {
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">
+              <label className="text-sm text-muted-foreground mb-2 block">
                 Wallet Name
               </label>
               <Input
@@ -198,13 +198,13 @@ export function WalletSelection() {
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">
+              <label className="text-sm text-muted-foreground mb-2 block">
                 Wallet Name
               </label>
               <Input placeholder="Imported Wallet" />
             </div>
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">
+              <label className="text-sm text-muted-foreground mb-2 block">
                 Recovery Phrase or Private Key
               </label>
               <Input

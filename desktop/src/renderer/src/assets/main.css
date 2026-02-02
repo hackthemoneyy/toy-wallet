@@ -1,9 +1,36 @@
 @import "tailwindcss";
 
 @theme {
+  /* shadcn color system - dark purple theme */
   --color-background: #0a0a0f;
-  --color-background-secondary: #12121a;
-  --color-background-tertiary: #1a1a25;
+  --color-foreground: #ffffff;
+
+  --color-card: #12121a;
+  --color-card-foreground: #ffffff;
+
+  --color-popover: #12121a;
+  --color-popover-foreground: #ffffff;
+
+  --color-primary: #8b5cf6;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #1a1a25;
+  --color-secondary-foreground: #ffffff;
+
+  --color-muted: #1a1a25;
+  --color-muted-foreground: #71717a;
+
+  --color-accent: #2a2a3a;
+  --color-accent-foreground: #ffffff;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #2a2a3a;
+  --color-input: #2a2a3a;
+  --color-ring: #8b5cf6;
+
+  /* Custom purple shades */
   --color-purple-50: #f5f3ff;
   --color-purple-100: #ede9fe;
   --color-purple-200: #ddd6fe;
@@ -14,47 +41,46 @@
   --color-purple-700: #6d28d9;
   --color-purple-800: #5b21b6;
   --color-purple-900: #4c1d95;
-  --color-border: #2a2a3a;
-  --color-border-light: #3a3a4a;
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #a1a1aa;
-  --color-text-muted: #71717a;
+
+  /* Additional custom colors */
   --color-success: #22c55e;
-  --color-error: #ef4444;
   --color-warning: #f59e0b;
+
+  /* Border radius */
+  --radius: 0.75rem;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    overflow: hidden;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
-  overflow: hidden;
-  user-select: none;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#root {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-background-secondary);
+  background: var(--color-card);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -63,5 +89,5 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-light);
+  background: var(--color-accent);
 }
