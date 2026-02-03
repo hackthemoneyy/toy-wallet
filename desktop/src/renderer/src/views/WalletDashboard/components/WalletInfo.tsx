@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { Copy, Check } from 'lucide-react'
 import { shortenAddress } from '@renderer/lib/utils'
-import type { Wallet } from '@renderer/store/wallet-store'
+import type { WalletWithBalance } from '@renderer/store/wallet-store'
 
 interface WalletInfoProps {
-  wallet: Wallet
+  wallet: WalletWithBalance
 }
 
 export function WalletInfo({ wallet }: WalletInfoProps) {

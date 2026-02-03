@@ -1,7 +1,12 @@
+/**
+ * WalletSelection View
+ * Lists wallets and handles wallet creation/import
+ */
+
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
-import { Plus, Download, Wallet, ChevronRight, Sparkles } from 'lucide-react'
+import { Plus, Download, Wallet, ChevronRight, Sparkles, Server, ServerOff, Loader2 } from 'lucide-react'
 import { Button } from '@renderer/components/ui/button'
 import { Card } from '@renderer/components/ui/card'
 import {
@@ -12,37 +17,107 @@ import {
   DialogTitle
 } from '@renderer/components/ui/dialog'
 import { Input } from '@renderer/components/ui/input'
-import { useWalletStore, type Wallet as WalletType } from '@renderer/store/wallet-store'
+import { useWallet, useWallets, useServerStatus } from '@renderer/hooks'
 import { shortenAddress, formatUSD } from '@renderer/lib/utils'
+import type { WalletWithBalance } from '@renderer/store/wallet-store'
 
 export function WalletSelection() {
   const navigate = useNavigate()
-  const { wallets, setActiveWallet, addWallet } = useWalletStore()
+
+  // Use hooks for wallet management
+  const { selectWallet } = useWallet()
+  const { wallets, isLoading, createWallet, verifyWallet, createState } = useWallets()
+  const { isConnected, status } = useServerStatus(30000)
+
+  // Dialog states
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [showImportDialog, setShowImportDialog] = useState(false)
-  const [newWalletName, setNewWalletName] = useState('')
+  const [showVerifyDialog, setShowVerifyDialog] = useState(false)
 
-  const handleSelectWallet = (wallet: WalletType) => {
-    setActiveWallet(wallet)
+  // Form states
+  const [newWalletName, setNewWalletName] = useState('')
+  const [newWalletEmail, setNewWalletEmail] = useState('')
+  const [newWalletPassword, setNewWalletPassword] = useState('')
+  const [verificationCode, setVerificationCode] = useState('')
+
+  // Handle wallet selection
+  const handleSelectWallet = (wallet: WalletWithBalance) => {
+    selectWallet(wallet)
     navigate('/dashboard')
   }
 
-  const handleCreateWallet = () => {
+  // Handle wallet creation
+  const handleCreateWallet = async () => {
     if (!newWalletName.trim()) return
 
-    const newWallet: WalletType = {
-      id: Date.now().toString(),
-      name: newWalletName,
-      address: `0x${Math.random().toString(16).slice(2, 42)}`,
-      balance: '0.0000',
-      usdBalance: 0,
-      tokens: [{ symbol: 'ETH', name: 'Ethereum', balance: '0.0000', usdValue: 0 }],
-      nfts: []
+    // If server is not connected, create a mock wallet
+    if (!isConnected) {
+      // Use mock wallet creation from the store
+      const { addWallet } = await import('@renderer/store/wallet-store').then(m => m.useWalletStore.getState())
+
+      const mockWallet = {
+        id: Date.now().toString(),
+        vaultId: `mock-vault-${Date.now()}`,
+        name: newWalletName,
+        type: 'fast' as const,
+        status: 'verified' as const,
+        addresses: [
+          { chain: 'Ethereum' as const, address: `0x${Math.random().toString(16).slice(2, 42)}` }
+        ],
+        primaryAddress: `0x${Math.random().toString(16).slice(2, 42)}`,
+        createdAt: new Date().toISOString(),
+        balance: '0.0000',
+        usdBalance: 0,
+        tokens: [],
+        nfts: []
+      }
+
+      addWallet(mockWallet as any)
+      setNewWalletName('')
+      setShowCreateDialog(false)
+      return
     }
 
-    addWallet(newWallet)
-    setNewWalletName('')
-    setShowCreateDialog(false)
+    // Create wallet via MPC server
+    const vaultId = await createWallet({
+      name: newWalletName,
+      email: newWalletEmail,
+      password: newWalletPassword,
+      type: 'fast'
+    })
+
+    if (vaultId && createState.requiresVerification) {
+      setShowCreateDialog(false)
+      setShowVerifyDialog(true)
+    }
+  }
+
+  // Handle wallet verification
+  const handleVerifyWallet = async () => {
+    if (!createState.vaultId || !verificationCode) return
+
+    const wallet = await verifyWallet({
+      vaultId: createState.vaultId,
+      code: verificationCode
+    })
+
+    if (wallet) {
+      setShowVerifyDialog(false)
+      setVerificationCode('')
+      setNewWalletName('')
+      setNewWalletEmail('')
+      setNewWalletPassword('')
+    }
+  }
+
+  // Reset form when dialog closes
+  const handleCreateDialogChange = (open: boolean) => {
+    setShowCreateDialog(open)
+    if (!open) {
+      setNewWalletName('')
+      setNewWalletEmail('')
+      setNewWalletPassword('')
+    }
   }
 
   return (
@@ -52,6 +127,28 @@ export function WalletSelection() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
+        {/* Server Status Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex items-center justify-center gap-2 mb-4"
+        >
+          {status === 'checking' ? (
+            <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+          ) : isConnected ? (
+            <Server className="w-4 h-4 text-green-500" />
+          ) : (
+            <ServerOff className="w-4 h-4 text-yellow-500" />
+          )}
+          <span className="text-xs text-muted-foreground">
+            {status === 'checking'
+              ? 'Connecting...'
+              : isConnected
+                ? 'MPC Server Connected'
+                : 'Offline Mode'}
+          </span>
+        </motion.div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <motion.div
@@ -67,6 +164,13 @@ export function WalletSelection() {
             Select a wallet or create a new one
           </p>
         </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 text-purple-500 animate-spin" />
+          </div>
+        )}
 
         {/* Wallet List */}
         <div className="space-y-3 mb-6">
@@ -113,6 +217,20 @@ export function WalletSelection() {
               </motion.div>
             ))}
           </AnimatePresence>
+
+          {/* Empty state */}
+          {!isLoading && wallets.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-8"
+            >
+              <p className="text-muted-foreground">No wallets yet</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Create your first wallet to get started
+              </p>
+            </motion.div>
+          )}
         </div>
 
         {/* Action Buttons */}
@@ -151,7 +269,7 @@ export function WalletSelection() {
       </motion.div>
 
       {/* Create Wallet Dialog */}
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+      <Dialog open={showCreateDialog} onOpenChange={handleCreateDialogChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -159,7 +277,9 @@ export function WalletSelection() {
               Create New Wallet
             </DialogTitle>
             <DialogDescription>
-              Your wallet will be secured using MPC technology
+              {isConnected
+                ? 'Your wallet will be secured using MPC technology'
+                : 'Creating wallet in offline mode (mock)'}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
@@ -173,12 +293,100 @@ export function WalletSelection() {
                 onChange={(e) => setNewWalletName(e.target.value)}
               />
             </div>
+
+            {/* Only show email/password when server is connected */}
+            {isConnected && (
+              <>
+                <div>
+                  <label className="text-sm text-muted-foreground mb-2 block">
+                    Email (for verification)
+                  </label>
+                  <Input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={newWalletEmail}
+                    onChange={(e) => setNewWalletEmail(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground mb-2 block">
+                    Password
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="Secure password"
+                    value={newWalletPassword}
+                    onChange={(e) => setNewWalletPassword(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
+
             <Button
               className="w-full"
               onClick={handleCreateWallet}
-              disabled={!newWalletName.trim()}
+              disabled={!newWalletName.trim() || createState.isCreating}
             >
-              Create Wallet
+              {createState.isCreating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                'Create Wallet'
+              )}
+            </Button>
+
+            {createState.error && (
+              <p className="text-sm text-red-400 text-center">
+                {createState.error.message}
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Verify Wallet Dialog */}
+      <Dialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-400" />
+              Verify Your Wallet
+            </DialogTitle>
+            <DialogDescription>
+              Enter the verification code sent to your email
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <label className="text-sm text-muted-foreground mb-2 block">
+                Verification Code
+              </label>
+              <Input
+                placeholder="000000"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                maxLength={6}
+                className="text-center text-2xl tracking-widest"
+              />
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Use code "000000" for test mode
+              </p>
+            </div>
+            <Button
+              className="w-full"
+              onClick={handleVerifyWallet}
+              disabled={verificationCode.length < 6 || createState.isCreating}
+            >
+              {createState.isCreating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                'Verify & Create'
+              )}
             </Button>
           </div>
         </DialogContent>
